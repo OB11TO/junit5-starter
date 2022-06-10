@@ -1,12 +1,15 @@
 package com.ob11to.junit.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class UserServiceTest {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class UserServiceTest {
 
     @Test
-    void test(){
-        Assertions.assertTrue(true);
+    void usersEmptyIfNoUserAdded(){
+        var userService = new UserService();
+        var users = userService.getAll();
+        assertTrue(users.isEmpty());
     }
 }
