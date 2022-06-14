@@ -3,10 +3,11 @@ package com.ob11to.junit.service;
 import com.ob11to.junit.dto.User;
 import org.junit.jupiter.api.*;
 
+import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @TestInstance(value = TestInstance.Lifecycle.PER_METHOD) //по умолчанию (каждый раз создается новый объект класса)
@@ -18,7 +19,7 @@ class UserServiceTest {
     private static final User PETR = User.of(2, "Petr", "321");
 
     @BeforeAll
-    static void init(){
+    static void init() {
         System.out.println("Before all");
     }
 
@@ -32,31 +33,37 @@ class UserServiceTest {
 
     @Test
     void usersEmptyIfNoUserAdded() {
-        System.out.println("Test 1: " + this );
+        System.out.println("Test 1: " + this);
         var users = userService.getAll();
-        assertTrue(users.isEmpty(), "NO Empty");
+
+        assertThat(users).isEmpty();
+//        assertTrue(users.isEmpty(), "NO Empty");
     }
 
     @Test
     void usersSizeIfUserAdded() {
-        System.out.println("Test 2: " + this );
+        System.out.println("Test 2: " + this);
         userService.add(IVAN);
         userService.add(PETR);
         var users = userService.getAll();
-        assertEquals(2, users.size());
+
+        assertThat(users).hasSize(2);
+//        assertEquals(2, users.size());
     }
 
     @Test
-    void loginSuccessIfUserExists(){
+    void loginSuccessIfUserExists() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getUsername(), IVAN.getPassword());
 
-        assertTrue(maybeUser.isPresent());
-        maybeUser.ifPresent(user -> assertEquals(user,IVAN));
+        assertThat(maybeUser).isPresent();
+        maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
+//        assertTrue(maybeUser.isPresent());
+//        maybeUser.ifPresent(user -> assertEquals(user, IVAN));
     }
 
     @Test
-    void loginFailIfPasswordIsNotCurrent(){
+    void loginFailIfPasswordIsNotCurrent() {
         userService.add(IVAN);
         var maybeUser = userService.login(IVAN.getUsername(), "dummy");
 
@@ -64,11 +71,24 @@ class UserServiceTest {
     }
 
     @Test
-    void loginFailIfUserDoesNotExist(){
+    void loginFailIfUserDoesNotExist() {
         userService.add(IVAN);
         var maybeUser = userService.login("dummy", "dummy");
 
         assertTrue(maybeUser.isEmpty());
+    }
+
+    @Test
+    void userConvertToMapById() {
+        userService.add(IVAN, PETR);
+        Map<Integer, User> userMap = userService.getAllConvertedById();
+
+        assertAll(
+                () -> assertThat(userMap).containsKeys(IVAN.getId(), PETR.getId()),
+                () -> assertThat(userMap).containsValues(IVAN, PETR)
+        );
+
+
     }
 
     @AfterEach
