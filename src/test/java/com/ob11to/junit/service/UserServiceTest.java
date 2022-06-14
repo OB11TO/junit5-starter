@@ -91,6 +91,25 @@ class UserServiceTest {
 
     }
 
+    @Test
+//    @org.junit.Test(expected = IllegalArgumentException.class)
+    void throwExceptionIfUsernameOrPasswordByNull() {
+        assertAll(
+                () -> {
+                    var exception = assertThrows(IllegalArgumentException.class, () -> userService.login(null, "dummy"));
+                    assertThat(exception.getMessage()).isEqualTo("username or password null");
+                },
+                () -> assertThrows(IllegalArgumentException.class, () -> userService.login("dummy", null))
+        );
+//        Так делать не правильно
+//        try {
+//            userService.login(null, "dummy");
+//            fail();
+//        } catch (IllegalArgumentException exception) {
+//            assertTrue(true);
+//        }
+    }
+
     @AfterEach
     void deleteDataFromDatabase() {
         System.out.println("After each " + this);
