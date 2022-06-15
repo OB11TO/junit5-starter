@@ -51,35 +51,6 @@ class UserServiceTest {
 //        assertEquals(2, users.size());
     }
 
-    @Test
-    @Tag("login")
-    void loginSuccessIfUserExists() {
-        userService.add(IVAN);
-        Optional<User> maybeUser = userService.login(IVAN.getUsername(), IVAN.getPassword());
-
-        assertThat(maybeUser).isPresent();
-        maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
-//        assertTrue(maybeUser.isPresent());
-//        maybeUser.ifPresent(user -> assertEquals(user, IVAN));
-    }
-
-    @Test
-    @Tag("login")
-    void loginFailIfPasswordIsNotCurrent() {
-        userService.add(IVAN);
-        var maybeUser = userService.login(IVAN.getUsername(), "dummy");
-
-        assertTrue(maybeUser.isEmpty());
-    }
-
-    @Test
-    @Tag("login")
-    void loginFailIfUserDoesNotExist() {
-        userService.add(IVAN);
-        var maybeUser = userService.login("dummy", "dummy");
-
-        assertTrue(maybeUser.isEmpty());
-    }
 
     @Test
     void userConvertToMapById() {
@@ -90,29 +61,8 @@ class UserServiceTest {
                 () -> assertThat(userMap).containsKeys(IVAN.getId(), PETR.getId()),
                 () -> assertThat(userMap).containsValues(IVAN, PETR)
         );
-
-
     }
 
-    @Test
-    @Tag("login")
-//    @org.junit.Test(expected = IllegalArgumentException.class)
-    void throwExceptionIfUsernameOrPasswordByNull() {
-        assertAll(
-                () -> {
-                    var exception = assertThrows(IllegalArgumentException.class, () -> userService.login(null, "dummy"));
-                    assertThat(exception.getMessage()).isEqualTo("username or password null");
-                },
-                () -> assertThrows(IllegalArgumentException.class, () -> userService.login("dummy", null))
-        );
-//        Так делать не правильно
-//        try {
-//            userService.login(null, "dummy");
-//            fail();
-//        } catch (IllegalArgumentException exception) {
-//            assertTrue(true);
-//        }
-    }
 
     @AfterEach
     void deleteDataFromDatabase() {
@@ -122,5 +72,58 @@ class UserServiceTest {
     @AfterAll
     static void closeConnectionPool() {
         System.out.println("After all ");
+    }
+
+
+    @Nested
+    @Tag("login")
+    @DisplayName("User logging test")
+    class LoginTest{
+
+        @Test
+        void loginSuccessIfUserExists() {
+            userService.add(IVAN);
+            Optional<User> maybeUser = userService.login(IVAN.getUsername(), IVAN.getPassword());
+
+            assertThat(maybeUser).isPresent();
+            maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
+//        assertTrue(maybeUser.isPresent());
+//        maybeUser.ifPresent(user -> assertEquals(user, IVAN));
+        }
+
+        @Test
+        void loginFailIfPasswordIsNotCurrent() {
+            userService.add(IVAN);
+            var maybeUser = userService.login(IVAN.getUsername(), "dummy");
+
+            assertTrue(maybeUser.isEmpty());
+        }
+
+        @Test
+        void loginFailIfUserDoesNotExist() {
+            userService.add(IVAN);
+            var maybeUser = userService.login("dummy", "dummy");
+
+            assertTrue(maybeUser.isEmpty());
+        }
+
+        @Test
+//    @org.junit.Test(expected = IllegalArgumentException.class)
+        void throwExceptionIfUsernameOrPasswordByNull() {
+            assertAll(
+                    () -> {
+                        var exception = assertThrows(IllegalArgumentException.class, () -> userService.login(null, "dummy"));
+                        assertThat(exception.getMessage()).isEqualTo("username or password null");
+                    },
+                    () -> assertThrows(IllegalArgumentException.class, () -> userService.login("dummy", null))
+            );
+//        Так делать не правильно
+//        try {
+//            userService.login(null, "dummy");
+//            fail();
+//        } catch (IllegalArgumentException exception) {
+//            assertTrue(true);
+//        }
+        }
     }
 }
