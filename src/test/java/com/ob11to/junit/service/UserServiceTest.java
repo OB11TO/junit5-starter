@@ -4,9 +4,12 @@ import com.ob11to.junit.dto.User;
 import com.ob11to.junit.paramresolver.UserServiceParamResolver;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -130,5 +133,33 @@ class UserServiceTest {
 //            assertTrue(true);
 //        }
         }
+
+        @ParameterizedTest
+//        @ParameterizedTest(name = "{arguments} test")
+//        @ArgumentsSource()
+//        @NullSource
+//        @EmptySource
+//        @NullAndEmptySource
+//        @ValueSource(strings = {
+//                "Ivan", "Petr"
+//        })
+        @MethodSource("com.ob11to.junit.service.UserServiceTest#getArgumentParameter")
+        @DisplayName("login param test")
+        void loginParameterTest(String username, String password, Optional<User> user) {
+            userService.add(IVAN, PETR);
+            var maybeUser = userService.login(username, password);
+            assertThat(maybeUser).isEqualTo(user);
+
+        }
+    }
+
+    static Stream<Arguments> getArgumentParameter() {
+        return Stream.of(
+                Arguments.of("Ivan", "123", Optional.of(IVAN)),
+                Arguments.of("Petr", "321", Optional.of(PETR)),
+                Arguments.of("Petr", "dummy", Optional.empty()),
+                Arguments.of("dummy", "123", Optional.empty())
+        );
+
     }
 }
