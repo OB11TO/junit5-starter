@@ -9,7 +9,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@Tag("fast")
 @TestInstance(value = TestInstance.Lifecycle.PER_METHOD) //по умолчанию (каждый раз создается новый объект класса)
 class UserServiceTest {
 
@@ -52,6 +52,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginSuccessIfUserExists() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getUsername(), IVAN.getPassword());
@@ -63,6 +64,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginFailIfPasswordIsNotCurrent() {
         userService.add(IVAN);
         var maybeUser = userService.login(IVAN.getUsername(), "dummy");
@@ -71,6 +73,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginFailIfUserDoesNotExist() {
         userService.add(IVAN);
         var maybeUser = userService.login("dummy", "dummy");
@@ -92,6 +95,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
 //    @org.junit.Test(expected = IllegalArgumentException.class)
     void throwExceptionIfUsernameOrPasswordByNull() {
         assertAll(
