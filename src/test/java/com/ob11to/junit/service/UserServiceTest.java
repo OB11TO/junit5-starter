@@ -1,7 +1,9 @@
 package com.ob11to.junit.service;
 
 import com.ob11to.junit.dto.User;
+import com.ob11to.junit.paramresolver.UserServiceParamResolver;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("fast")
 @TestInstance(value = TestInstance.Lifecycle.PER_METHOD) //по умолчанию (каждый раз создается новый объект класса)
+@ExtendWith({
+        UserServiceParamResolver.class
+})
 class UserServiceTest {
 
     //Глобальные переменные
@@ -24,10 +29,10 @@ class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare() {
+    void prepare(UserService userService) {
         System.out.println("Before each " + this);
         //инициализация переменных
-        userService = new UserService();
+        this.userService = userService;
     }
 
 
@@ -78,7 +83,7 @@ class UserServiceTest {
     @Nested
     @Tag("login")
     @DisplayName("User logging test")
-    class LoginTest{
+    class LoginTest {
 
         @Test
         void loginSuccessIfUserExists() {
