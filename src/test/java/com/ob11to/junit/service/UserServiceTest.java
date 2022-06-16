@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -100,6 +102,7 @@ class UserServiceTest {
         }
 
         @Test
+        @Disabled("flaky test") //отдельно тест запускается, а так нет
         void loginFailIfPasswordIsNotCurrent() {
             userService.add(IVAN);
             var maybeUser = userService.login(IVAN.getUsername(), "dummy");
@@ -107,12 +110,21 @@ class UserServiceTest {
             assertTrue(maybeUser.isEmpty());
         }
 
-        @Test
+        @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
         void loginFailIfUserDoesNotExist() {
             userService.add(IVAN);
             var maybeUser = userService.login("dummy", "dummy");
 
             assertTrue(maybeUser.isEmpty());
+        }
+
+        //Timout
+        @Test
+        @Timeout(value = 100L, unit = TimeUnit.MILLISECONDS) //можно писать над классами, лучше использовать их не для юнит тестов
+        void checkLoginFunctionalityPerformance(){
+            //выполниться в отдельном потоке
+            var result  = assertTimeoutPreemptively(Duration.ofMillis(200L), () -> userService.login("dummy", "dummy"));
+
         }
 
         @Test
