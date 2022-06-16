@@ -1,4 +1,4 @@
-package com.ob11to.junit.paramresolver;
+package com.ob11to.junit.extension;
 
 import com.ob11to.junit.service.UserService;
 import org.junit.jupiter.api.extension.ExtensionContext;

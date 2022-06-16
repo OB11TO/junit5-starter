@@ -1,7 +1,9 @@
 package com.ob11to.junit.service;
 
 import com.ob11to.junit.dto.User;
-import com.ob11to.junit.paramresolver.UserServiceParamResolver;
+import com.ob11to.junit.extension.GlobalExtensionCallback;
+import com.ob11to.junit.extension.PostProcessingExtension;
+import com.ob11to.junit.extension.UserServiceParamResolver;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,11 +17,14 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.*;
 
 @Tag("fast")
-@TestInstance(value = TestInstance.Lifecycle.PER_METHOD) //по умолчанию (каждый раз создается новый объект класса)
+@TestInstance(value = Lifecycle.PER_METHOD) //по умолчанию (каждый раз создается новый объект класса)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+        GlobalExtensionCallback.class,
+        PostProcessingExtension.class
 })
 class UserServiceTest {
 
