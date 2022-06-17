@@ -1,5 +1,6 @@
 package com.ob11to.junit.service;
 
+import com.ob11to.junit.dao.UserDao;
 import com.ob11to.junit.dto.User;
 import com.ob11to.junit.extension.GlobalExtensionCallback;
 import com.ob11to.junit.extension.PostProcessingExtension;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.Map;
@@ -30,6 +32,7 @@ class UserServiceTest {
 
     //Глобальные переменные
     private UserService userService;
+    private UserDao userDao;
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User PETR = User.of(2, "Petr", "321");
 
@@ -39,10 +42,34 @@ class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare(UserService userService) {
+    void prepare() {
         System.out.println("Before each " + this);
         //инициализация переменных
-        this.userService = userService;
+//        userDao = new UserDao(); так нельзя делать, так как не нужно реально обращаться к методу
+        userDao = Mockito.mock(UserDao.class); // делаем мок, теперь нужно запрограммировать
+        userService = new UserService(userDao);
+    }
+
+    @Test
+    void shouldDeleteExistedUser() {
+        userService.add(IVAN);
+
+        //Первый вариант
+//        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
+//        Mockito.doReturn(true).when(userDao).delete(Mockito.any());  разница в том, что без разницы какой объект удалили
+
+        //Второй вариант
+        Mockito.when(userDao.delete(IVAN.getId()))
+                .thenReturn(true)
+                .thenReturn(false); //1 раз удаляет, все остальные будут false
+
+        var deleteResult = userService.delete(IVAN.getId());
+
+//        assertTrue(deleteResult);
+        assertThat(deleteResult).isTrue();
+
+        System.out.println(userService.delete(IVAN.getId()));
+        System.out.println(userService.delete(IVAN.getId()));
     }
 
 
@@ -107,7 +134,8 @@ class UserServiceTest {
         }
 
         @Test
-        @Disabled("flaky test") //отдельно тест запускается, а так нет
+        @Disabled("flaky test")
+            //отдельно тест запускается, а так нет
         void loginFailIfPasswordIsNotCurrent() {
             userService.add(IVAN);
             var maybeUser = userService.login(IVAN.getUsername(), "dummy");
@@ -125,10 +153,11 @@ class UserServiceTest {
 
         //Timout
         @Test
-        @Timeout(value = 100L, unit = TimeUnit.MILLISECONDS) //можно писать над классами, лучше использовать их не для юнит тестов
-        void checkLoginFunctionalityPerformance(){
+        @Timeout(value = 100L, unit = TimeUnit.MILLISECONDS)
+        //можно писать над классами, лучше использовать их не для юнит тестов
+        void checkLoginFunctionalityPerformance() {
             //выполниться в отдельном потоке
-            var result  = assertTimeoutPreemptively(Duration.ofMillis(200L), () -> userService.login("dummy", "dummy"));
+            var result = assertTimeoutPreemptively(Duration.ofMillis(200L), () -> userService.login("dummy", "dummy"));
 
         }
 
