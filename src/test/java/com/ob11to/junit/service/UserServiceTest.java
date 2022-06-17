@@ -48,7 +48,7 @@ class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare() {
+    void prepare(@Mock UserDao userDao) { //пример благодаря тому, что @Mock реализует ParameterResolver
         System.out.println("Before each " + this);
         //инициализация переменных
 //        userDao = new UserDao(); так нельзя делать, так как не нужно реально обращаться к методу
