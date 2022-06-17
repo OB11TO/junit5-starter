@@ -46,7 +46,8 @@ class UserServiceTest {
         System.out.println("Before each " + this);
         //инициализация переменных
 //        userDao = new UserDao(); так нельзя делать, так как не нужно реально обращаться к методу
-        userDao = Mockito.mock(UserDao.class); // делаем мок, теперь нужно запрограммировать
+//        userDao = Mockito.mock(UserDao.class); // делаем мок, теперь нужно запрограммировать
+        userDao = Mockito.spy(new UserDao());
         userService = new UserService(userDao);
     }
 
@@ -55,13 +56,13 @@ class UserServiceTest {
         userService.add(IVAN);
 
         //Первый вариант
-//        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
+        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
 //        Mockito.doReturn(true).when(userDao).delete(Mockito.any());  разница в том, что без разницы какой объект удалили
 
         //Второй вариант
-        Mockito.when(userDao.delete(IVAN.getId()))
-                .thenReturn(true)
-                .thenReturn(false); //1 раз удаляет, все остальные будут false
+//        Mockito.when(userDao.delete(IVAN.getId()))
+//                .thenReturn(true)
+//                .thenReturn(false); //1 раз удаляет, все остальные будут false
 
         var deleteResult = userService.delete(IVAN.getId());
 
@@ -70,6 +71,8 @@ class UserServiceTest {
 
         System.out.println(userService.delete(IVAN.getId()));
         System.out.println(userService.delete(IVAN.getId()));
+
+        Mockito.verify(userDao, Mockito.times(3)).delete(IVAN.getId());
     }
 
 
