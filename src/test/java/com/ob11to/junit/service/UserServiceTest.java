@@ -9,7 +9,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Map;
@@ -26,12 +29,15 @@ import static org.junit.jupiter.api.TestInstance.*;
 @ExtendWith({
         UserServiceParamResolver.class,
         GlobalExtensionCallback.class,
-        PostProcessingExtension.class
+        PostProcessingExtension.class,
+        MockitoExtension.class
 })
 class UserServiceTest {
 
     //Глобальные переменные
+    @InjectMocks
     private UserService userService;
+    @Mock
     private UserDao userDao;
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User PETR = User.of(2, "Petr", "321");
@@ -47,8 +53,8 @@ class UserServiceTest {
         //инициализация переменных
 //        userDao = new UserDao(); так нельзя делать, так как не нужно реально обращаться к методу
 //        userDao = Mockito.mock(UserDao.class); // делаем мок, теперь нужно запрограммировать
-        userDao = Mockito.spy(new UserDao());
-        userService = new UserService(userDao);
+//        userDao = Mockito.spy(new UserDao());
+//        userService = new UserService(userDao);
     }
 
     @Test
